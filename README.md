@@ -72,7 +72,7 @@ Firm_V12 is built with MDK5.
 
 
 --------
-Some development notes: [SAROO 技术点滴](doc/SAROO技术点滴.txt)
+Some development notes: [SAROO Technical Notes](doc/SAROO_Technical_Notes.txt)
 
 --------
 ### Project Layout
