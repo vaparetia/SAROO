@@ -74,39 +74,38 @@ Firm_V12 is built with MDK5.
 --------
 Some development notes: [SAROO Technical Notes](doc/SAROO_Technical_Notes.txt)
 
---------
 ### Project Layout
-
-`.git/` Git metadata for the repository.
-`.git/hooks/` Git hook templates and hooks.
-`.git/info/` Repository-specific Git info.
-`.git/objects/` Git object database.
-`.git/refs/` Git references (branches, tags).
-`.git/logs/` Git ref logs.
-`FPGA/` FPGA source, build scripts, and Quartus project files for the CDBLOCK implementation.
-`Firm_MCU/` STM32 MCU firmware source and project files that handle CDBLOCK commands and SD access.
-`Firm_MCU/DebugConfig/` Debug configuration profiles for STM32 tools.
-`Firm_MCU/FatFS/` FatFS filesystem sources and configuration.
-`Firm_MCU/Main/` MCU firmware entry points and platform drivers.
-`Firm_MCU/RTE/` CMSIS/RTX runtime environment configuration and device startup files.
-`Firm_MCU/Saturn/` Saturn-side protocol and CDC handling code used by the MCU.
-`Firm_MCU/Startup/` STM32 startup and system initialization files.
-`Firm_MCU/inc/` MCU firmware headers and USB/FATFS interfaces.
-`Firm_Saturn/` Saturn-side firmware and tooling used by the system software on the console.
-`Firm_Saturn/sega/` Saturn system area binaries and regional system data.
-`HW/` Hardware design files (schematics/PCB) and related outputs.
-`HW/__Previews/` Altium preview artifacts for schematics/PCB.
-`doc/` Documentation, configuration notes, and images used by the README.
-`old/` Archived or legacy versions of hardware/firmware/FPGA sources.
-`old/FPGA_old/` Early FPGA experiments and Qsys-based designs.
-`old/FPGA_v11/` Legacy FPGA project for V1.1 hardware.
-`old/Firm_v11_STM32/` Legacy STM32 firmware for V1.1 hardware.
-`old/HW_v11/` Legacy V1.1 hardware design files.
-`tools/` Host-side utilities for assets, saves, fonts, and media processing.
-`tools/bdfont/` Bitmap font tools and font sources.
-`tools/cdgtools/` CDG playback/fix tools.
-`tools/covertool/` Cover image tool.
-`tools/cpktools/` Cinepak and media tooling.
-`tools/cpktools/ffmpeg/` Local ffmpeg config/script used by media tools.
-`tools/cpktools/cplayk/` Cinepak player tooling and sources.
-`tools/savetool/` Save data utilities.
+<pre>
+.
+├── FPGA
+│   ├── SSMaster.qpf / SSMaster.qsf / SSMaster.sdc
+│   ├── Verilog: SSMaster.v, cacheblk.v, cachebus.v, memhub.v, tsdram.v
+│   └── IP: cdcfifo.*, mainpll.*
+├── Firm_MCU
+│   ├── Main: main.c, shell.c, spi1_fpga.c, sdio_h7.c, version.c
+│   ├── Saturn: saturn_main.c, saturn_cdc.c, cdimg.c
+│   ├── FatFS: ff.* / diskio.*
+│   ├── Startup: startup_stm32h750xx.s, system_init.c
+│   └── inc: board_config.h, teeny_usb*, tusb*
+├── Firm_Saturn
+│   ├── main.c, game_load.c, game_save.c, sci_shell.c, version.c
+│   ├── Sega BIOS blobs in `sega/`
+│   └── linker + startup: ldscript, crt0.S, sysid.S
+├── HW
+│   ├── Altium schematics: *.SchDoc, *.PcbDoc, *.PrjPCB
+│   └── PDFs: ssmaster_top.pdf, ssmaster_bot.pdf, ssmaster_v1.pdf, ssmaster_v2.PDF
+├── doc
+│   ├── images: saroo_dev1.png, saroo_scr1.png, saroo_v12_top.jpg
+│   └── docs: SAROO_Technical_Notes.txt, saroocfg.txt, PROJECT_LAYOUT.md
+├── old
+│   ├── FPGA_old / FPGA_v11
+│   ├── Firm_v11_STM32
+│   └── HW_v11
+├── tools
+│   ├── bdfont
+│   ├── cdgtools
+│   ├── covertool
+│   ├── cpktools
+│   └── savetool
+└── README.md
+</pre>
