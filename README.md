@@ -1,11 +1,11 @@
 
 ### SAROO is a HDLoader for SEGA Saturn.
 
-SAROO是一个土星光驱模拟器。SAROO插在卡槽上，实现原主板的CDBLOCK的功能，从SD卡装载游戏并运行。
-SAROO同时还提供1MB/4MB加速卡功能。
+SAROO is a Saturn CD-drive emulator. SAROO plugs into the cartridge slot and implements the original mainboard CDBLOCK functionality, loading and running games from an SD card.
+SAROO also provides 1MB/4MB RAM expansion functionality.
 
 --------
-### 一些图片
+### Some Pictures
 
 <img src="doc/saroo_v12_top.jpg" width=48%/>  <img src="doc/saroo_v12_bot.jpg" width=48%/>
 <img src="doc/saroo_scr1.png" width=48%/>  <img src="doc/saroo_scr2.png" width=48%/>
@@ -14,65 +14,99 @@ SAROO同时还提供1MB/4MB加速卡功能。
 
 
 --------
-### 开发历史
+### Development History
 
 #### V1.0
-最初的SAROO仅仅是在常见的usbdevcart上增加了一个usbhost接口。需要对游戏主程序进行破解，将对CDBLOCK的操作转化为对U盘的操作。
-这种方式需要针对每一个游戏做修改，不具备通用性。性能与稳定性也有很大问题。只有很少的几个游戏通过这种方式跑起来了。
-(V1.0相关的文件未包括在本项目中)
+The earliest SAROO version only added a USB host interface to a common usbdevcart. It required patching each game’s main program to convert CDBLOCK access into USB storage access.
+This meant every game needed its own modification, so it was not general. Performance and stability were also poor. Only a few games were made to run in this way.
+(V1.0-related files are not included in this project.)
 
 
 #### V1.1
-新版本做了全新的设计。采用FPGA+MCU的方式。FPGA(EP4CE6)用来实现CDBLOCK的硬件接口，MCU(STM32F103)运行固件来处理各种CDBLOCK命令。
-这个版本基本达到了预期的目的，也有游戏几乎能运行了。但也有一个致命的问题: 随机的数据错误。在播放片头动画时会出现各种马赛克，
-并最终死掉。这个问题很难调试定位。这导致了本项目停滞了很长时间。
+The new version was a complete redesign: FPGA + MCU. The FPGA (EP4CE6) implements the CDBLOCK hardware interface, and the MCU (STM32F103) runs firmware to handle CDBLOCK commands.
+This version largely achieved the goal and some games were nearly playable. But there was a fatal issue: random data errors. During intro videos, mosaics/glitches would appear and eventually the game would hang.
+This was very difficult to debug and led to the project stalling for a long time.
 
 
 #### V1.2
-1.2版本是1.1版本的bugfix与性能提升，使用了更高性能的MCU:STM32H750。它频率足够高(400MHz)，内部有足够大的SRAM，可以容纳完整的CDC缓存。
-FPGA内部也经过重构，抛弃了qsys系统，使用自己实现的SDRAM与总线结构。这个版本不负众望，已经是接近完美的状态了。
-同时，通过把FPGA与MCU固件逆移植到V1.1硬件之上，V1.1也基本达到了V1.2的性能了。
+Version 1.2 is a bugfix and performance upgrade of 1.1, using a higher-performance MCU: STM32H750. Its frequency is high enough (400MHz) and it has enough internal SRAM to hold a full CDC cache.
+The FPGA was also reworked internally, abandoning Qsys and using a custom SDRAM and bus architecture. This version met expectations and is nearly perfect.
+By backporting the FPGA and MCU firmware to V1.1 hardware, V1.1 also essentially reaches V1.2 performance.
 
 
 --------
-### 当前状态
+### Current Status
 
-测试的几十个游戏可以完美运行。  
-1MB/4MB加速卡功能可以正常使用。  
-SD卡支持FAT32/ExFAT文件系统。  
-支持cue/bin格式的镜像文件。单bin或多bin。  
-部分游戏会卡在加载/片头动画界面。  
-部分游戏会卡在进行游戏时。  
-
-
---------
-### 硬件与固件
-
-原理图与PCB使用AltiumDesign14制作。  
-V1.1版本需要飞线才能正常工作。不应该再使用这个版本了。  
-V1.2版本仍然需要额外的一个上拉电阻以使用FPGA的AS配置方式。  
-
-FPGA使用Quartus14.0开发。  
-
-Firm_Saturn使用SaturnOrbit自带的SH-ELF编译器编译。  
-Firm_v11使用MDK4编译。  
-Firm_V12使用MDK5编译。  
+Dozens of tested games run perfectly.  
+1MB/4MB RAM expansion works normally.  
+SD cards with FAT32/ExFAT are supported.  
+Supports cue/bin images, single-bin or multi-bin.  
+Some games get stuck at loading/intro screens.  
+Some games hang during gameplay.  
 
 
 --------
-### SD卡文件放置
+### Hardware and Firmware
+
+Schematics and PCB were created in Altium Designer 14.  
+V1.1 requires fly wires to work correctly. This version should no longer be used.  
+V1.2 still needs an extra pull-up resistor to use the FPGA AS configuration mode.  
+
+FPGA development uses Quartus 14.0.  
+
+Firm_Saturn is built with the SH-ELF compiler included in SaturnOrbit.  
+Firm_v11 is built with MDK4.  
+Firm_V12 is built with MDK5.  
+
+
+--------
+### SD Card File Layout
 
 <pre>
-/ramimage.bin      ;Saturn的固件程序.
-/SAROO/ISO/        ;存放游戏镜像. 每个目录放一个游戏. 目录名将显示在菜单中.
-/SAROO/update/     ;存放用于升级的固件.
+/ramimage.bin      ; Saturn firmware program.
+/SAROO/ISO/        ; Game images. One game per directory. The directory name is shown in the menu.
+/SAROO/update/     ; Firmware update files.
                    ;  FPGA: SSMaster.rbf
                    ;  MCU : ssmaster.bin
 </pre>
 
 
 --------
-一些开发中的记录: [SAROO技术点滴](doc/SAROO技术点滴.txt)
+Some development notes: [SAROO 技术点滴](doc/SAROO技术点滴.txt)
 
+--------
+### Project Layout
 
-
+`.git/` Git metadata for the repository.
+`.git/hooks/` Git hook templates and hooks.
+`.git/info/` Repository-specific Git info.
+`.git/objects/` Git object database.
+`.git/refs/` Git references (branches, tags).
+`.git/logs/` Git ref logs.
+`FPGA/` FPGA source, build scripts, and Quartus project files for the CDBLOCK implementation.
+`Firm_MCU/` STM32 MCU firmware source and project files that handle CDBLOCK commands and SD access.
+`Firm_MCU/DebugConfig/` Debug configuration profiles for STM32 tools.
+`Firm_MCU/FatFS/` FatFS filesystem sources and configuration.
+`Firm_MCU/Main/` MCU firmware entry points and platform drivers.
+`Firm_MCU/RTE/` CMSIS/RTX runtime environment configuration and device startup files.
+`Firm_MCU/Saturn/` Saturn-side protocol and CDC handling code used by the MCU.
+`Firm_MCU/Startup/` STM32 startup and system initialization files.
+`Firm_MCU/inc/` MCU firmware headers and USB/FATFS interfaces.
+`Firm_Saturn/` Saturn-side firmware and tooling used by the system software on the console.
+`Firm_Saturn/sega/` Saturn system area binaries and regional system data.
+`HW/` Hardware design files (schematics/PCB) and related outputs.
+`HW/__Previews/` Altium preview artifacts for schematics/PCB.
+`doc/` Documentation, configuration notes, and images used by the README.
+`old/` Archived or legacy versions of hardware/firmware/FPGA sources.
+`old/FPGA_old/` Early FPGA experiments and Qsys-based designs.
+`old/FPGA_v11/` Legacy FPGA project for V1.1 hardware.
+`old/Firm_v11_STM32/` Legacy STM32 firmware for V1.1 hardware.
+`old/HW_v11/` Legacy V1.1 hardware design files.
+`tools/` Host-side utilities for assets, saves, fonts, and media processing.
+`tools/bdfont/` Bitmap font tools and font sources.
+`tools/cdgtools/` CDG playback/fix tools.
+`tools/covertool/` Cover image tool.
+`tools/cpktools/` Cinepak and media tooling.
+`tools/cpktools/ffmpeg/` Local ffmpeg config/script used by media tools.
+`tools/cpktools/cplayk/` Cinepak player tooling and sources.
+`tools/savetool/` Save data utilities.
