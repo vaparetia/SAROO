@@ -699,8 +699,12 @@ int end_trans(void)
 			}
 		}
 	}else{
-		SSLOG(_BUFIO, "end_trans: cdwnum=%08x FIFO_STAT=%08x RCNT=%04x min_num=%d\n", cdb.cdwnum, FIFO_STAT, FIFO_RCNT, min_num);
-		fifo_remain = (FIFO_STAT&0x0fff)*2; // FIFO中还有多少字节未读
+		int fifo_stat = FIFO_STAT;
+		int fifo_rcnt = FIFO_RCNT;
+		fifo_rcnt  |= (fifo_stat&0xf000)<<4;
+		fifo_remain = (fifo_stat&0x0fff)*2; // FIFO中还有多少字节未读
+
+		SSLOG(_BUFIO, "end_trans: cdwnum=%08x FIFO_STAT=%08x RCNT=%04x min_num=%d\n", cdb.cdwnum, fifo_stat, fifo_rcnt, min_num);
 		if(fifo_remain>=512){
 			//FIFO中的数据大于512字节，不会产生中断。cdwnum会少记一次。
 			cdb.cdwnum += 0x800;
@@ -909,7 +913,15 @@ int seek_cd(void)
 }
 
 // 0x12 [SR]
-// Scan not support
+int scan_cd(void)
+{
+	cdb.scan_dir = (cdb.cr1&0xff);
+	SSLOG(_CDRV, "\nscan_cd: dir=%d\n", cdb.scan_dir);
+
+	cdb.status = STAT_SCAN;
+	set_report(cdb.status);
+	return 0;
+}
 
 /******************************************************************************/
 // Subcode 相关命令
@@ -2042,6 +2054,7 @@ char *cmd_str(int cmd)
 	// cd drive
 	case 0x10: return "play_cd";
 	case 0x11: return "seek_cd";
+	case 0x12: return "scan_cd";
 
 	// subcode
 	case 0x20: return "get_subcode";
@@ -2106,7 +2119,6 @@ void cdc_cmd_process(void)
 	//if(cmd!=0)
 		SSLOG(_DEBUG, "\nSS CDC: HIRQ=%04x STAT=%02x  %s\n", HIRQ, cdb.status, cmd_str(cmd));
 
-	cmd = (cdb.cr1>>8)&0xff;
 	switch(cmd){
 	// common
 	case 0x00: hirq = get_cd_status();
@@ -2128,6 +2140,8 @@ void cdc_cmd_process(void)
 	case 0x10: hirq = play_cd();
 		break;
 	case 0x11: hirq = seek_cd();
+		break;
+	case 0x12: hirq = scan_cd();
 		break;
 
 	// subcode

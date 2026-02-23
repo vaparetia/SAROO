@@ -267,7 +267,7 @@ typedef struct
 	u8  has_subrw;
 	u8  subrw_wp;
 	u8  subrw_rp;
-	u8  unuse;
+	u8  scan_dir;
 
 	int play_type;
 	int play_wait;
@@ -325,7 +325,7 @@ extern int total_disc;
 #define _FILTER    0x0080
 #define _DTASK     0x0100
 
-#define LOG_MASK_DEFAULT  (_FILEIO | _CDRV | _INFO | _FILTER | _DTASK)
+#define LOG_MASK_DEFAULT  (_FILEIO | _CDRV | _INFO | _DTASK)
 
 extern int log_mask;
 
